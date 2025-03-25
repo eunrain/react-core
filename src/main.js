@@ -1,3 +1,4 @@
-export default function App() {
-  return <h1>Hello, World!</h1>;
-}
+import App from './App';
+
+const app = App();
+console.log(JSON.stringify(app, null, 2));
