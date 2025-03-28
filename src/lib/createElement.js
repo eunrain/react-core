@@ -1,10 +1,14 @@
 export default function createElement(type, props, ...children) {
+  if (typeof type === 'function') {
+    const component = type(props);
+    return component;
+  }
   return {
     type,
     props: {
       ...props,
       children: children.map((child) =>
-        typeof child === 'object'
+        typeof child === 'object' && child !== null
           ? child
           : { type: 'TEXT_ELEMENT', props: { nodeValue: child, children: [] } }
       ),
