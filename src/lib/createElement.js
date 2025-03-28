@@ -16,7 +16,7 @@ export default function createElement(type, props, ...children) {
   };
 }
 
-// test
+// test 코드
 const vdom = createElement('h1', { className: 'title' }, 'Hello, world!');
 console.log(vdom);
 console.log(JSON.stringify(vdom, null, 2));
