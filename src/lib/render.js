@@ -10,10 +10,12 @@ function createDOM(vdom) {
 
   if (vdom.type === 'Fragment') {
     const fragment = document.createDocumentFragment();
-    const children = Array.isArray(vdom.props.children)
-      ? vdom.props.children
-      : [vdom.props.children];
-    children.forEach((child) => fragment.appendChild(createDOM(child)));
+    const children = vdom.props?.children;
+    if (Array.isArray(children)) {
+      children.forEach((child) => fragment.appendChild(createDOM(child)));
+    } else if (children != null) {
+      fragment.appendChild(createDOM(children));
+    }
     return fragment;
   }
 
