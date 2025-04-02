@@ -1,8 +1,10 @@
 import App from './App';
-import render from './lib/render';
+import { createRoot } from './lib/createRoot';
 
 const app = App();
 console.log(JSON.stringify(app, null, 2));
 
-const root = document.getElementById('app');
-render(app, root);
+const rootEl = document.getElementById('app');
+const root = createRoot(rootEl);
+
+root.render(App());
