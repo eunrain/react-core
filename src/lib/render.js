@@ -27,7 +27,9 @@ function createDOM(vdom) {
 
   for (const [key, value] of Object.entries(vdom.props || {})) {
     if (key === 'children') continue;
-    if (key.startsWith('on')) {
+    if (key === 'style' && typeof value === 'object') {
+      Object.assign(dom.style, value);
+    } else if (key.startsWith('on')) {
       dom.addEventListener(key.slice(2).toLowerCase(), value);
     } else {
       dom.setAttribute(key, value);
