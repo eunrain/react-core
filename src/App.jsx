@@ -1,10 +1,9 @@
-import Counter from './components/Counter';
+import TodoList from './components/TodoList';
 
 export default function App() {
   return (
     <>
-      <h1>useState 테스트</h1>
-      <Counter />
+      <TodoList />
     </>
   );
 }
