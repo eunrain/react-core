@@ -7,4 +7,4 @@ console.log(JSON.stringify(app, null, 2));
 const rootEl = document.getElementById('app');
 const root = createRoot(rootEl);
 
-root.render(App());
+root.render(App);

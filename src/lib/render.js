@@ -31,6 +31,8 @@ function createDOM(vdom) {
       Object.assign(dom.style, value);
     } else if (key.startsWith('on')) {
       dom.addEventListener(key.slice(2).toLowerCase(), value);
+    } else if (key in dom) {
+      dom[key] = value;
     } else {
       dom.setAttribute(key, value);
     }
