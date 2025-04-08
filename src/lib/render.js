@@ -5,44 +5,51 @@ export default function render(vdom, container) {
 
 function createDOM(vdom) {
   if (vdom === null || vdom === undefined || typeof vdom === 'boolean') {
-    return document.createTextNode('');
+    return null;
   }
 
   if (typeof vdom === 'string' || typeof vdom === 'number') {
     return document.createTextNode(vdom);
   }
 
-  if (vdom.type === 'Fragment') {
-    const fragment = document.createDocumentFragment();
-    const children = vdom.props?.children;
-    if (Array.isArray(children)) {
-      children.forEach((child) => fragment.appendChild(createDOM(child)));
-    } else if (children != null) {
-      fragment.appendChild(createDOM(children));
-    }
-    return fragment;
-  }
+  // 노드 생성
+  const dom =
+    vdom.type === 'Fragment'
+      ? document.createDocumentFragment()
+      : document.createElement(vdom.type);
 
-  const dom = document.createElement(vdom.type);
+  const propsKeyMap = {
+    className: 'class',
+    htmlFor: 'for',
+  };
 
+  // props 처리
   for (const [key, value] of Object.entries(vdom.props || {})) {
     if (key === 'children') continue;
-    if (key === 'style' && typeof value === 'object') {
-      Object.assign(dom.style, value);
-    } else if (key.startsWith('on')) {
-      dom.addEventListener(key.slice(2).toLowerCase(), value);
-    } else if (key in dom) {
-      dom[key] = value;
+
+    const actualKey = propsKeyMap[key] || key;
+
+    if (actualKey === 'style' && typeof value === 'object') {
+      Object.assign(dom.style ?? {}, value);
+    } else if (actualKey.startsWith('on')) {
+      dom.addEventListener(actualKey.slice(2).toLowerCase(), value);
+    } else if (actualKey in dom) {
+      dom[actualKey] = value;
     } else {
-      dom.setAttribute(key, value);
+      dom.setAttribute?.(actualKey, value);
     }
   }
 
+  // children 처리
   const children = vdom.props?.children;
   if (Array.isArray(children)) {
-    children.forEach((child) => dom.appendChild(createDOM(child)));
+    children.forEach((child) => {
+      const childDOM = createDOM(child);
+      if (childDOM) dom.appendChild(childDOM);
+    });
   } else if (children != null) {
-    dom.appendChild(createDOM(children));
+    const childDOM = createDOM(children);
+    if (childDOM) dom.appendChild(childDOM);
   }
 
   return dom;
