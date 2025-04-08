@@ -12,30 +12,28 @@ function createDOM(vdom) {
     return document.createTextNode(vdom);
   }
 
-  if (vdom.type === 'Fragment') {
-    const fragment = document.createDocumentFragment();
-    const children = vdom.props?.children;
-    if (Array.isArray(children)) {
-      children.forEach((child) => fragment.appendChild(createDOM(child)));
-    } else if (children != null) {
-      fragment.appendChild(createDOM(children));
-    }
-    return fragment;
-  }
+  // 노드 생성
+  const dom =
+    vdom.type === 'Fragment'
+      ? document.createDocumentFragment()
+      : document.createElement(vdom.type);
 
-  const dom = document.createElement(vdom.type);
-
+  // props 처리
   for (const [key, value] of Object.entries(vdom.props || {})) {
     if (key === 'children') continue;
+
     if (key === 'style' && typeof value === 'object') {
-      Object.assign(dom.style, value);
+      Object.assign(dom.style ?? {}, value);
     } else if (key.startsWith('on')) {
       dom.addEventListener(key.slice(2).toLowerCase(), value);
+    } else if (key in dom) {
+      dom[key] = value;
     } else {
-      dom.setAttribute(key, value);
+      dom.setAttribute?.(key, value);
     }
   }
 
+  // children 처리
   const children = vdom.props?.children;
   if (Array.isArray(children)) {
     children.forEach((child) => {
