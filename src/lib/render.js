@@ -18,18 +18,25 @@ function createDOM(vdom) {
       ? document.createDocumentFragment()
       : document.createElement(vdom.type);
 
+  const propsKeyMap = {
+    className: 'class',
+    htmlFor: 'for',
+  };
+
   // props 처리
   for (const [key, value] of Object.entries(vdom.props || {})) {
     if (key === 'children') continue;
 
-    if (key === 'style' && typeof value === 'object') {
+    const actualKey = propsKeyMap[key] || key;
+
+    if (actualKey === 'style' && typeof value === 'object') {
       Object.assign(dom.style ?? {}, value);
-    } else if (key.startsWith('on')) {
-      dom.addEventListener(key.slice(2).toLowerCase(), value);
-    } else if (key in dom) {
-      dom[key] = value;
+    } else if (actualKey.startsWith('on')) {
+      dom.addEventListener(actualKey.slice(2).toLowerCase(), value);
+    } else if (actualKey in dom) {
+      dom[actualKey] = value;
     } else {
-      dom.setAttribute?.(key, value);
+      dom.setAttribute?.(actualKey, value);
     }
   }
 
