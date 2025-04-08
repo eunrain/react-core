@@ -5,7 +5,7 @@ export default function render(vdom, container) {
 
 function createDOM(vdom) {
   if (vdom === null || vdom === undefined || typeof vdom === 'boolean') {
-    return document.createTextNode('');
+    return null;
   }
 
   if (typeof vdom === 'string' || typeof vdom === 'number') {
@@ -38,9 +38,13 @@ function createDOM(vdom) {
 
   const children = vdom.props?.children;
   if (Array.isArray(children)) {
-    children.forEach((child) => dom.appendChild(createDOM(child)));
+    children.forEach((child) => {
+      const childDOM = createDOM(child);
+      if (childDOM) dom.appendChild(childDOM);
+    });
   } else if (children != null) {
-    dom.appendChild(createDOM(children));
+    const childDOM = createDOM(children);
+    if (childDOM) dom.appendChild(childDOM);
   }
 
   return dom;
