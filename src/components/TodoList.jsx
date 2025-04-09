@@ -5,8 +5,7 @@ export default function TodoList() {
   const [todos, setTodos] = useState([]);
 
   const addTodo = () => {
-    if (!input.trim()) return;
-    setTodos([...todos, { text: input, done: false }]);
+    setTodos([...todos, { value: input, done: false }]);
     setInput('');
   };
 
@@ -23,26 +22,26 @@ export default function TodoList() {
 
   return (
     <div>
-      <h2>📋 Todo List</h2>
+      <h2>📋 TodoList</h2>
       <input
         value={input}
-        onchange={(e) => setInput(e.target.value)}
+        onInput={(e) => setInput(e.target.value)}
         placeholder="할 일을 입력하세요"
       />
-      <button onclick={addTodo}>추가</button>
+      <button onClick={addTodo}>추가</button>
 
-      <ul>
-        {todos.map((todo, index) => (
-          <li>
+      <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+        {todos?.map((todo, index) => (
+          <li key={index}>
             <input
               type="checkbox"
               checked={todo.done}
-              onchange={() => toggleTodo(index)}
+              onChange={() => toggleTodo(index)}
             />
             <span style={todo.done ? 'text-decoration: line-through;' : ''}>
-              {todo.text}
+              {todo.value}
             </span>
-            <button onclick={() => removeTodo(index)}>삭제</button>
+            <button onClick={() => removeTodo(index)}>삭제</button>
           </li>
         ))}
       </ul>
