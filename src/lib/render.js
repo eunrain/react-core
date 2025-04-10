@@ -45,7 +45,7 @@ function createDOM(vdom) {
   const children = vdom.props?.children;
 
   if (children == null) {
-    return;
+    return dom;
   }
 
   if (Array.isArray(children)) {
