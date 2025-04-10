@@ -29,10 +29,11 @@ function createDOM(vdom) {
 
     const actualKey = propsKeyMap[key] || key;
 
-    if (actualKey === 'style' && typeof value === 'object') {
+    if (key.startsWith('on') && typeof value === 'function') {
+      const eventName = key.slice(2).toLowerCase();
+      dom.addEventListener(eventName, value);
+    } else if (actualKey === 'style' && typeof value === 'object') {
       Object.assign(dom.style ?? {}, value);
-    } else if (actualKey.startsWith('on')) {
-      dom.addEventListener(actualKey.slice(2).toLowerCase(), value);
     } else if (actualKey in dom) {
       dom[actualKey] = value;
     } else {
