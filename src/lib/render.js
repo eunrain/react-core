@@ -42,12 +42,17 @@ function createDOM(vdom) {
 
   // children 처리
   const children = vdom.props?.children;
+
+  if (children == null) {
+    return;
+  }
+
   if (Array.isArray(children)) {
     children.forEach((child) => {
       const childDOM = createDOM(child);
       if (childDOM) dom.appendChild(childDOM);
     });
-  } else if (children != null) {
+  } else {
     const childDOM = createDOM(children);
     if (childDOM) dom.appendChild(childDOM);
   }
