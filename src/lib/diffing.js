@@ -1,21 +1,7 @@
 import { createDOM } from './render';
 
-export function diff(prevNode, nextNode, parentDom) {
-  if (typeof prevNode === 'string' || typeof prevNode === 'number') {
-    if (typeof nextNode === 'string' || typeof nextNode === 'number') {
-      if (prevNode !== nextNode) {
-        const textNode = document.createTextNode(nextNode);
-        parentDom.replaceChild(textNode, parentDom.firstChild);
-      }
-    } else {
-      parentDom.replaceChild(createDOM(nextNode), parentDom.firstChild);
-    }
-    return;
-  }
-
-  if (typeof nextNode === 'string' || typeof nextNode === 'number') {
-    const textNode = document.createTextNode(nextNode);
-    parentDom.replaceChild(textNode, prevNode.dom);
+export function diffing(prevNode, nextNode, parentDom) {
+  if (diffTextNode(prevNode, nextNode, parentDom)) {
     return;
   }
 
@@ -30,13 +16,44 @@ export function diff(prevNode, nextNode, parentDom) {
   }
 
   if (prevNode.type !== nextNode.type) {
-    parentDom.replaceChild(createDOM(nextNode), prevNode.dom);
+    const newDom = createDOM(nextNode);
+    const oldDom =
+      typeof prevNode === 'object' && prevNode?.dom
+        ? prevNode.dom
+        : parentDom.firstChild;
+    if (oldDom && newDom) {
+      parentDom.replaceChild(newDom, oldDom);
+    }
     return;
   }
 
   const dom = (nextNode.dom = prevNode.dom);
   updateAttributes(dom, prevNode.props, nextNode.props);
   updateChildren(prevNode.props?.children, nextNode.props?.children, dom);
+}
+
+function diffTextNode(prevNode, nextNode, parentDom) {
+  const isPrevText =
+    typeof prevNode === 'string' || typeof prevNode === 'number';
+  const isNextText =
+    typeof nextNode === 'string' || typeof nextNode === 'number';
+
+  if (isPrevText && isNextText) {
+    if (prevNode !== nextNode) {
+      const textNode = document.createTextNode(nextNode);
+      parentDom.replaceChild(textNode, parentDom.firstChild);
+    }
+    return true;
+  }
+
+  if (isPrevText || isNextText) {
+    const textNode = document.createTextNode(String(nextNode));
+    const replaceTarget = isPrevText ? parentDom.firstChild : prevNode.dom;
+    parentDom.replaceChild(textNode, replaceTarget);
+    return true;
+  }
+
+  return false;
 }
 
 function updateAttributes(dom, prev = {}, next = {}) {
@@ -86,6 +103,6 @@ function updateChildren(prevChildren, nextChildren, parentDom) {
       continue;
     }
 
-    diff(prevChild, nextChild, parentDom);
+    diffing(prevChild, nextChild, parentDom);
   }
 }

@@ -1,7 +1,7 @@
 import App from '../App';
 import { createRoot } from './createRoot';
 import { resetIndex } from './useState';
-import { diff } from './diffing';
+import { diffing } from './diffing';
 
 let container = null;
 let prevVDOM = null;
@@ -18,7 +18,7 @@ export function reRender() {
     const root = createRoot(container);
     root.render(nextVDOM);
   } else {
-    diff(prevVDOM, nextVDOM, container);
+    diffing(prevVDOM, nextVDOM, container);
   }
 
   prevVDOM = nextVDOM;
