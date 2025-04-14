@@ -3,7 +3,7 @@ export default function render(vdom, container) {
   container.appendChild(el);
 }
 
-function createDOM(vdom) {
+export function createDOM(vdom) {
   if (vdom === null || vdom === undefined || typeof vdom === 'boolean') {
     return null;
   }
@@ -17,6 +17,8 @@ function createDOM(vdom) {
     vdom.type === 'Fragment'
       ? document.createDocumentFragment()
       : document.createElement(vdom.type);
+
+  vdom.dom = dom;
 
   const propsKeyMap = {
     className: 'class',
