@@ -6,29 +6,45 @@ function checkChildren(children) {
   return flat.length === 1 ? flat[0] : flat;
 }
 
-export default function createElement(type, props = {}, ...children) {
+export default function createElement(type, config, ...children) {
+  const { key, ref, ...rest } = config ?? {};
   const childrenContent = checkChildren(children);
 
   if (typeof type === 'function') {
-    return type({ ...props, children: childrenContent });
+    return type({ ...rest, children: childrenContent });
   }
 
   if (type === Fragment) {
     return {
       type: 'Fragment',
-      props: { ...props, children: childrenContent },
+      props: {
+        ...rest,
+        children: childrenContent,
+      },
+      ref,
+      key: key != null ? String(key) : null,
     };
   }
 
   if (typeof type === 'string' || type === null) {
     return {
       type,
-      props: { ...props, children: childrenContent },
+      props: {
+        ...rest,
+        children: childrenContent,
+      },
+      ref,
+      key: key != null ? String(key) : null,
     };
   }
 
   return {
     type,
-    props: { ...props, children: null },
+    props: {
+      ...rest,
+      children: null,
+    },
+    ref,
+    key: key != null ? String(key) : null,
   };
 }
