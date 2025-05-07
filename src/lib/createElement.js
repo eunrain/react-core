@@ -2,14 +2,15 @@ export const Fragment = Symbol('Fragment');
 
 function checkChildren(children) {
   if (!children.length) return null;
-  return children.length === 1 ? children[0] : children;
+  const flat = children.flat(Infinity);
+  return flat.length === 1 ? flat[0] : flat;
 }
 
 export default function createElement(type, props = {}, ...children) {
   const childrenContent = checkChildren(children);
 
   if (typeof type === 'function') {
-    return type(props);
+    return type({ ...props, children: childrenContent });
   }
 
   if (type === Fragment) {
