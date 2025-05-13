@@ -1,10 +1,10 @@
 export default function render(vdom, container) {
-  const el = createDOM(vdom);
-  container.appendChild(el);
+  const dom = createDOM(vdom);
+  if (dom) container.appendChild(dom);
 }
 
 export function createDOM(vdom) {
-  if (vdom === null || vdom === undefined || typeof vdom === 'boolean') {
+  if (vdom == null || typeof vdom === 'boolean') {
     return null;
   }
 
@@ -12,53 +12,44 @@ export function createDOM(vdom) {
     return document.createTextNode(vdom);
   }
 
-  // 노드 생성
+  const { type, props } = vdom;
+
   const dom =
-    vdom.type === 'Fragment'
+    type === 'Fragment'
       ? document.createDocumentFragment()
-      : document.createElement(vdom.type);
+      : document.createElement(type);
 
-  vdom.dom = dom;
+  setProps(dom, props);
+  setChildren(dom, props?.children);
+  return dom;
+}
 
-  const propsKeyMap = {
-    className: 'class',
-    htmlFor: 'for',
-  };
-
-  // props 처리
-  for (const [key, value] of Object.entries(vdom.props || {})) {
+function setProps(dom, props) {
+  for (const [key, value] of Object.entries(props)) {
     if (key === 'children') continue;
-
-    const actualKey = propsKeyMap[key] || key;
-
     if (key.startsWith('on') && typeof value === 'function') {
-      const eventName = key.slice(2).toLowerCase();
-      dom.addEventListener(eventName, value);
-    } else if (actualKey === 'style' && typeof value === 'object') {
-      Object.assign(dom.style ?? {}, value);
-    } else if (actualKey in dom) {
-      dom[actualKey] = value;
+      const event = key.slice(2).toLowerCase();
+      dom.addEventListener(event, value);
+    } else if (key === 'className') {
+      dom.setAttribute('class', value);
+    } else if (key === 'htmlFor') {
+      dom.setAttribute('for', value);
+    } else if (key === 'style' && typeof value === 'object') {
+      Object.assign(dom.style, value);
     } else {
-      dom.setAttribute?.(actualKey, value);
+      dom.setAttribute(key, value);
     }
   }
+}
 
-  // children 처리
-  const children = vdom.props?.children;
-
-  if (children == null) {
-    return dom;
-  }
-
+function setChildren(parent, children) {
   if (Array.isArray(children)) {
     children.forEach((child) => {
       const childDOM = createDOM(child);
-      if (childDOM) dom.appendChild(childDOM);
+      if (childDOM) parent.appendChild(childDOM);
     });
-  } else {
+  } else if (children != null) {
     const childDOM = createDOM(children);
-    if (childDOM) dom.appendChild(childDOM);
+    if (childDOM) parent.appendChild(childDOM);
   }
-
-  return dom;
 }
