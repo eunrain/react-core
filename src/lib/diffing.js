@@ -1,108 +1,65 @@
 import { createDOM } from './render';
+import { setProperty } from './set-property';
+import { isPrimitiveType } from './check-type';
 
 export function diffing(prevNode, nextNode, parentDom) {
-  if (diffTextNode(prevNode, nextNode, parentDom)) {
-    return;
-  }
+  updateDOM(parentDom, prevNode, nextNode);
+}
 
-  if (!prevNode) {
-    parentDom.appendChild(createDOM(nextNode));
-    return;
-  }
-
-  if (!nextNode) {
-    parentDom.removeChild(prevNode.dom);
-    return;
-  }
-
-  if (prevNode.type !== nextNode.type) {
-    const newDom = createDOM(nextNode);
-    const oldDom =
-      typeof prevNode === 'object' && prevNode?.dom
-        ? prevNode.dom
-        : parentDom.firstChild;
-    if (oldDom && newDom) {
-      parentDom.replaceChild(newDom, oldDom);
+function updateDOM(parent, oldNode, newNode) {
+  if (isPrimitiveType(oldNode) && isPrimitiveType(newNode)) {
+    if (oldNode !== newNode) {
+      parent.textContent = newNode;
     }
     return;
   }
 
-  const dom = (nextNode.dom = prevNode.dom);
-  updateAttributes(dom, prevNode.props, nextNode.props);
-  updateChildren(prevNode.props?.children, nextNode.props?.children, dom);
-}
-
-function diffTextNode(prevNode, nextNode, parentDom) {
-  const isPrevText =
-    typeof prevNode === 'string' || typeof prevNode === 'number';
-  const isNextText =
-    typeof nextNode === 'string' || typeof nextNode === 'number';
-
-  if (isPrevText && isNextText) {
-    if (prevNode !== nextNode) {
-      const textNode = document.createTextNode(nextNode);
-      parentDom.replaceChild(textNode, parentDom.firstChild);
-    }
-    return true;
+  if (oldNode == null) {
+    const dom = createDOM(newNode);
+    if (dom) parent.appendChild(dom);
+    return;
   }
 
-  if (isPrevText || isNextText) {
-    const textNode = document.createTextNode(String(nextNode));
-    const replaceTarget = isPrevText ? parentDom.firstChild : prevNode.dom;
-    parentDom.replaceChild(textNode, replaceTarget);
-    return true;
+  if (newNode == null) {
+    parent.removeChild(oldNode.dom);
+    return;
   }
 
-  return false;
+  if (oldNode.type !== newNode.type) {
+    const newDom = createDOM(newNode);
+    parent.replaceChild(newDom, oldNode.dom);
+    return;
+  }
+
+  const dom = (newNode.dom = oldNode.dom);
+  diffProps(dom, oldNode.props, newNode.props);
+  diffChildren(dom, oldNode.props?.children, newNode.props?.children);
 }
 
-function updateAttributes(dom, prev = {}, next = {}) {
+function diffProps(dom, prev, next) {
   for (const key in prev) {
     if (!(key in next)) {
       dom.removeAttribute(key);
+      if (key.startsWith('on') && typeof prev[key] === 'function') {
+        const event = key.slice(2).toLowerCase();
+        dom.removeEventListener(event, prev[key]);
+      }
     }
   }
 
   for (const [key, value] of Object.entries(next)) {
     if (key === 'children') continue;
-    if (key.startsWith('on') && typeof value === 'function') {
-      dom[key] = value;
-      dom.addEventListener(key.slice(2).toLowerCase(), value);
-    } else {
-      dom[key] = value;
-    }
+    setProperty(dom, key, value);
   }
 }
 
-function updateChildren(prevChildren, nextChildren, parentDom) {
+function diffChildren(dom, prevChildren, nextChildren) {
   const prev = Array.isArray(prevChildren) ? prevChildren : [prevChildren];
   const next = Array.isArray(nextChildren) ? nextChildren : [nextChildren];
 
   const max = Math.max(prev.length, next.length);
 
   for (let i = 0; i < max; i++) {
-    const prevChild = prev[i];
-    const nextChild = next[i];
-
-    if (prevChild == null) {
-      const newChild = createDOM(nextChild);
-      parentDom.appendChild(newChild);
-      continue;
-    }
-
-    if (nextChild == null) {
-      const domToRemove =
-        typeof prevChild === 'object' && prevChild?.dom
-          ? prevChild.dom
-          : parentDom.childNodes[i];
-
-      if (domToRemove) {
-        parentDom.removeChild(domToRemove);
-      }
-
-      continue;
-    }
-
-    diffing(prevChild, nextChild, parentDom);
+    updateDOM(dom, prev[i], next[i]);
   }
 }

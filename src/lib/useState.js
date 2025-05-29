@@ -1,4 +1,4 @@
-import { reRender } from './reRender';
+import { reRender } from './re-render';
 
 const state = { index: 0, list: [] };
 

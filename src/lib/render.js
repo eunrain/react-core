@@ -1,3 +1,5 @@
+import { setProperty } from './set-property';
+
 export default function render(vdom, container) {
   const dom = createDOM(vdom);
   if (dom) container.appendChild(dom);
@@ -19,6 +21,8 @@ export function createDOM(vdom) {
       ? document.createDocumentFragment()
       : document.createElement(type);
 
+  vdom.dom = dom;
+
   setProps(dom, props);
   setChildren(dom, props?.children);
   return dom;
@@ -27,18 +31,7 @@ export function createDOM(vdom) {
 function setProps(dom, props) {
   for (const [key, value] of Object.entries(props)) {
     if (key === 'children') continue;
-    if (key.startsWith('on') && typeof value === 'function') {
-      const event = key.slice(2).toLowerCase();
-      dom.addEventListener(event, value);
-    } else if (key === 'className') {
-      dom.setAttribute('class', value);
-    } else if (key === 'htmlFor') {
-      dom.setAttribute('for', value);
-    } else if (key === 'style' && typeof value === 'object') {
-      Object.assign(dom.style, value);
-    } else {
-      dom.setAttribute(key, value);
-    }
+    setProperty(dom, key, value);
   }
 }
 
