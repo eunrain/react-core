@@ -1,4 +1,4 @@
-import useState from '../lib/useState';
+import { useState } from '../react/useState';
 
 export default function Counter() {
   const [count, setCount] = useState(0);

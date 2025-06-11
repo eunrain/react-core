@@ -1,3 +1,3 @@
-import { reRender } from './lib/re-render';
+import { reRender } from './react/re-render';
 
 reRender();

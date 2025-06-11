@@ -1,4 +1,4 @@
-import useState from '../lib/useState';
+import { useState } from '../react/useState';
 
 export default function TodoList() {
   const [input, setInput] = useState('');

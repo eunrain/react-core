@@ -1,5 +1,5 @@
-import { useEffect } from './lib/useEffect';
-import { useState } from './lib/useState';
+import { useEffect } from './react/useEffect';
+import { useState } from './react/useState';
 
 export default function App() {
   const [count, setCount] = useState(0);
