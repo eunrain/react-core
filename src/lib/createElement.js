@@ -6,7 +6,7 @@ function checkChildren(children) {
   return flat.length === 1 ? flat[0] : flat;
 }
 
-export default function createElement(type, config, ...children) {
+export function createElement(type, config, ...children) {
   const { key, ref, ...rest } = config ?? {};
   const childrenContent = checkChildren(children);
 

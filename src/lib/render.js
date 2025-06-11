@@ -1,6 +1,6 @@
 import { setProperty } from './set-property';
 
-export default function render(vdom, container) {
+export function render(vdom, container) {
   const dom = createDOM(vdom);
   if (dom) container.appendChild(dom);
 }

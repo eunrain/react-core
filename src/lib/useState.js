@@ -2,11 +2,11 @@ import { reRender } from './re-render';
 
 const state = { index: 0, list: [] };
 
-export function resetIndex() {
+export function resetStateIndex() {
   state.index = 0;
 }
 
-export default function useState(initialValue) {
+export function useState(initialValue) {
   const currentIndex = state.index;
 
   if (!(currentIndex in state.list)) {

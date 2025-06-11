@@ -5,7 +5,7 @@ export default defineConfig({
   esbuild: {
     jsxFactory: 'createElement',
     jsxFragment: 'Fragment',
-    jsxInject: `import createElement, {Fragment} from '@/lib/createElement.js'`,
+    jsxInject: `import {createElement, Fragment} from '@/lib/createElement.js'`,
   },
   resolve: {
     alias: {

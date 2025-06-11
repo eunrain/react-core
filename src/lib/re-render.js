@@ -1,7 +1,8 @@
 import App from '../App';
 import { createRoot } from './createRoot';
-import { resetIndex } from './useState';
+import { resetStateIndex } from './useState';
 import { diffing } from './diffing';
+import { resetEffectIndex } from './useEffect';
 
 let container = null;
 let prevVDOM = null;
@@ -11,7 +12,9 @@ export function reRender() {
     container = document.getElementById('app');
   }
 
-  resetIndex();
+  resetStateIndex();
+  resetEffectIndex();
+
   const nextVDOM = App();
 
   if (prevVDOM === null) {
